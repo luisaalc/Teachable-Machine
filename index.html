@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Detector de Carta — Teachable Machine</title>
+<style>
+  :root {
+    --purple-900: #2e1065;
+    --purple-700: #6d28d9;
+    --purple-500: #8b5cf6;
+    --purple-300: #c4b5fd;
+    --purple-100: #f3eefe;
+    --bg: #faf9fc;
+    --text: #241b34;
+    --text-soft: #6b6480;
+    --radius: 16px;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  header {
+    width: 100%;
+    background: linear-gradient(135deg, var(--purple-900), var(--purple-700));
+    color: white;
+    padding: 40px 20px 30px;
+    text-align: center;
+  }
+
+  header h1 {
+    margin: 0 0 8px;
+    font-size: 1.8rem;
+    letter-spacing: -0.5px;
+  }
+
+  header p {
+    margin: 0;
+    color: var(--purple-100);
+    font-size: 0.95rem;
+    opacity: 0.9;
+  }
+
+  main {
+    width: 100%;
+    max-width: 640px;
+    padding: 32px 20px 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 24px;
+  }
+
+  .card {
+    width: 100%;
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: 0 8px 24px rgba(109, 40, 217, 0.08);
+    border: 1px solid var(--purple-100);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  #start-btn {
+    background: var(--purple-700);
+    color: white;
+    border: none;
+    padding: 12px 32px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 999px;
+    cursor: pointer;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+
+  #start-btn:hover {
+    background: var(--purple-900);
+    transform: translateY(-1px);
+  }
+
+  #start-btn:active {
+    transform: translateY(0);
+  }
+
+  #webcam-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid var(--purple-300);
+    box-shadow: 0 8px 20px rgba(109, 40, 217, 0.15);
+    width: 320px;
+    height: 320px;
+  }
+
+  #webcam-container canvas {
+    width: 320px;
+    height: 320px;
+    object-fit: cover;
+  }
+
+  #label-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  #label-container div {
+    background: var(--purple-100);
+    border-left: 4px solid var(--purple-500);
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--purple-900);
+  }
+
+  .hint {
+    color: var(--text-soft);
+    font-size: 0.85rem;
+    text-align: center;
+    margin: 0;
+  }
+
+  footer {
+    color: var(--text-soft);
+    font-size: 0.8rem;
+    padding-bottom: 24px;
+    text-align: center;
+  }
+
+  footer a {
+    color: var(--purple-700);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🔮 Detector de Carta</h1>
+  <p>Aplicação de reconhecimento de imagem com Teachable Machine</p>
+</header>
+
+<main>
+  <div class="card">
+    <button id="start-btn" type="button" onclick="init()">Iniciar câmera</button>
+    <div id="webcam-container"></div>
+    <div id="label-container"></div>
+    <p class="hint">Permita o acesso à câmera e posicione a carta em frente à webcam.</p>
+  </div>
+</main>
+
+<footer>
+  Projeto feito com <a href="https://teachablemachine.withgoogle.com/" target="_blank" rel="noopener">Teachable Machine</a>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+<script type="text/javascript">
+    // Modelo hospedado localmente, na pasta "my_model" ao lado deste index.html
+    // (model.json, metadata.json e weights.bin)
+    const URL = "./my_model/";
+
+    let model, webcam, labelContainer, maxPredictions;
+
+    async function init() {
+        const modelURL = URL + "model.json";
+        const metadataURL = URL + "metadata.json";
+
+        model = await tmImage.load(modelURL, metadataURL);
+        maxPredictions = model.getTotalClasses();
+
+        const flip = true;
+        webcam = new tmImage.Webcam(320, 320, flip);
+        await webcam.setup();
+        await webcam.play();
+        window.requestAnimationFrame(loop);
+
+        document.getElementById("webcam-container").innerHTML = "";
+        document.getElementById("webcam-container").appendChild(webcam.canvas);
+
+        labelContainer = document.getElementById("label-container");
+        labelContainer.innerHTML = "";
+        for (let i = 0; i < maxPredictions; i++) {
+            labelContainer.appendChild(document.createElement("div"));
+        }
+    }
+
+    async function loop() {
+        webcam.update();
+        await predict();
+        window.requestAnimationFrame(loop);
+    }
+
+    async function predict() {
+        const prediction = await model.predict(webcam.canvas);
+        for (let i = 0; i < maxPredictions; i++) {
+            const classPrediction =
+                prediction[i].className + ": " + prediction[i].probability.toFixed(2);
+            labelContainer.childNodes[i].innerHTML = classPrediction;
+        }
+    }
+</script>
+
+</body>
+</html>
