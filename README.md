@@ -57,9 +57,11 @@ Os dados usados para treinar o modelo **foram gravados por mim mesmoa**, diretam
 
 Foram capturadas amostras em vídeo/imagem para cada uma das três classes (`com carta`, `sem carta` e `fundo`), variando levemente ângulo, posição e enquadramento durante a gravação.
 
-## Prints de uso do modelo
+## Print do painel de treino
 
-> Adicione abaixo as capturas de tela da aplicação em funcionamento, mostrando as predições para cada classe.
+![Print do painel de treino](./prints/teachable-machine.png)
+
+## Prints de uso do modelo
 
 ![Print com carta](./prints/com-carta.png)
 ![Print sem carta](./prints/sem-carta.png)
