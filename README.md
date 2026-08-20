@@ -59,12 +59,13 @@ Foram capturadas amostras em vídeo/imagem para cada uma das três classes (`com
 
 ## Print do painel de treino
 
-![Print do painel de treino](./prints/teachable-machine.png)
+[Print do painel de treino](./prints/teachable-machine.png)
 
 ## Prints de uso do modelo
 
-![Print com carta](./prints/print-com-carta.png)
-![Print sem carta](./prints/print-sem-carta.png)
+[Print com carta](./prints/print-com-carta.png)
+[Print sem carta](./prints/print-sem-carta.png)
+[Vídeo de demonstração](./prints/demonstração.mp4)
 
 ## Reflexão sobre os testes
 
