@@ -14,7 +14,7 @@ Aplicação web simples que usa a webcam para identificar, em tempo real, se o u
 
 ## Modelo
 
-O modelo não é carregado de um link externo do Teachable Machine — ele foi exportado como arquivo (painel *Export Model → Download my model*) e está incluído neste próprio repositório, na pasta [`my_model/`](./my_model):
+O modelo é carregado de um link externo do Teachable Machine — ele foi exportado como arquivo (painel *Export Model → Download my model*) e está incluído neste próprio repositório, na pasta [`my_model/`](./my_model):
 
 ```
 my_model/
@@ -23,13 +23,11 @@ my_model/
  └── weights.bin     → pesos treinados
 ```
 
-O `index.html` carrega o modelo direto dessa pasta local:
+O `index.html` carrega o modelo direto do link hospedado pelo Google: https://teachablemachine.withgoogle.com/models/V5-YG544t/
 
 ```js
 const URL = "./my_model/";
 ```
-
-> Se você preferir usar o link hospedado pelo Google em vez dos arquivos locais, basta trocar essa constante pelo link do painel *Export Model → Upload my model* (formato `https://teachablemachine.withgoogle.com/models/hf0yu45t0/`).
 
 ## Código-fonte da aplicação
 
@@ -55,7 +53,7 @@ Principais funções do script:
 
 Os dados usados para treinar o modelo **foram gravados por mim mesma**, diretamente pela webcam dentro do próprio Teachable Machine — não foi utilizado nenhum dataset externo ou pronto.
 
-Foram capturadas amostras em vídeo/imagem para cada uma das três classes (`com carta`, `sem carta` e `fundo`), variando levemente ângulo, posição e enquadramento durante a gravação.
+Foram capturadas amostras em vídeo/imagem para cada uma das três classes (`com carta` e `sem carta`), variando levemente ângulo, posição e enquadramento durante a gravação.
 
 ## Print do painel de treino
 
@@ -65,15 +63,15 @@ Foram capturadas amostras em vídeo/imagem para cada uma das três classes (`com
 
 [Print com carta](./prints/print-com-carta.png)
 [Print sem carta](./prints/print-sem-carta.png)
-[Vídeo de demonstração](./prints/demonstração.mp4)
+[Vídeo de demonstração](./prints/demonstracao.mp4)
 
 ## Reflexão sobre os testes
 
-Durante os testes, o modelo não confundiu as classes `com carta` e `sem carta`. Isso provavelmente aconteceu por causa do fundo sem informação, boa iluminação e falta de variação nos testes. Para conferir a qualidade real do modelo seria interessante testar em locais com fundo e iluminações diferentes.
+Durante os testes, o modelo confundiu as classes `com carta` e `sem carta`. Isso provavelmente aconteceu por causa da distância da câmera com a carta utilizada no momento de treinamento do modelo. Para resolver este problema seria interessante treinar o modelo com mais variação de distância, ângulo e de fundo.
 
 ## Como executar
 
-1. Mantenha a pasta `my_model/` (com `model.json`, `metadata.json` e `weights.bin`) ao lado do `index.html` — não mova nem renomeie os arquivos.
+1. É necessário baixar apenas o index.html.
 2. Sirva a pasta com um servidor local (ex: extensão Live Server do VS Code) e abra pelo `http://localhost:...`. Alguns navegadores bloqueiam a webcam e o carregamento de arquivos locais quando o HTML é aberto direto do disco (`file:///...`).
 3. Clique em **Iniciar câmera** e permita o acesso à webcam.
 4. Posicione-se em frente à câmera, com ou sem a carta, e observe as probabilidades sendo atualizadas em tempo real.

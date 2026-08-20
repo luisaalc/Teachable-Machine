@@ -208,63 +208,107 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
+
 <script type="text/javascript">
-    // Modelo hospedado localmente, na pasta "my_model" ao lado deste index.html
-    // (model.json, metadata.json e weights.bin)
-    const URL = "./my_model/";
+
+    // Link do modelo hospedado no Teachable Machine
+    const URL = "https://teachablemachine.withgoogle.com/models/V5-YG544t/";
 
     let model, webcam, labelContainer, maxPredictions;
 
+    // Carrega o modelo e inicia a câmera
     async function init() {
         const modelURL = URL + "model.json";
         const metadataURL = URL + "metadata.json";
 
+        // Carrega o modelo
         model = await tmImage.load(modelURL, metadataURL);
+
+        // Quantidade total de categorias
         maxPredictions = model.getTotalClasses();
 
+        // Configuração da webcam
         const flip = true;
         webcam = new tmImage.Webcam(320, 320, flip);
+
         await webcam.setup();
         await webcam.play();
+
         window.requestAnimationFrame(loop);
 
+        // Coloca a câmera na página
         document.getElementById("webcam-container").innerHTML = "";
         document.getElementById("webcam-container").appendChild(webcam.canvas);
 
+        // Cria os espaços para as categorias
         labelContainer = document.getElementById("label-container");
         labelContainer.innerHTML = "";
+
+        // Só cria elementos para as categorias diferentes de "fundo"
         for (let i = 0; i < maxPredictions; i++) {
+
+            const className = model.getClassLabels()[i];
+
+            // Ignora a categoria "fundo"
+            if (className.toLowerCase() === "fundo") {
+                continue;
+            }
+
             const item = document.createElement("div");
+
             item.innerHTML = `
                 <div class="label-row">
                     <span class="label-name"></span>
                     <span class="label-percent"></span>
                 </div>
+
                 <div class="bar-track">
                     <div class="bar-fill"></div>
                 </div>
             `;
+
+            // Guarda o índice original da previsão
+            item.dataset.index = i;
+
             labelContainer.appendChild(item);
         }
     }
 
+    // Atualiza a câmera continuamente
     async function loop() {
         webcam.update();
         await predict();
+
         window.requestAnimationFrame(loop);
     }
 
+    // Faz a previsão
     async function predict() {
+
         const prediction = await model.predict(webcam.canvas);
-        for (let i = 0; i < maxPredictions; i++) {
-            const percent = (prediction[i].probability * 100).toFixed(0);
-            const item = labelContainer.childNodes[i];
-            item.querySelector(".label-name").textContent = prediction[i].className;
-            item.querySelector(".label-percent").textContent = percent + "%";
-            item.querySelector(".bar-fill").style.width = percent + "%";
+
+        // Percorre os elementos exibidos
+        const items = labelContainer.children;
+
+        for (let i = 0; i < items.length; i++) {
+
+            // Recupera o índice original da categoria
+            const index = parseInt(items[i].dataset.index);
+
+            const className = prediction[index].className;
+            const percent = (prediction[index].probability * 100).toFixed(0);
+
+            items[i].querySelector(".label-name").textContent = className;
+            items[i].querySelector(".label-percent").textContent = percent + "%";
+
+            items[i].querySelector(".bar-fill").style.width = percent + "%";
         }
     }
+
 </script>
+
+</body>
+</html>
 
 </body>
 </html>
