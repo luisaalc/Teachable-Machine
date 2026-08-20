@@ -53,7 +53,7 @@ Principais funções do script:
 
 ## Origem dos dados
 
-Os dados usados para treinar o modelo **foram gravados por mim mesmoa**, diretamente pela webcam dentro do próprio Teachable Machine — não foi utilizado nenhum dataset externo ou pronto.
+Os dados usados para treinar o modelo **foram gravados por mim mesma**, diretamente pela webcam dentro do próprio Teachable Machine — não foi utilizado nenhum dataset externo ou pronto.
 
 Foram capturadas amostras em vídeo/imagem para cada uma das três classes (`com carta`, `sem carta` e `fundo`), variando levemente ângulo, posição e enquadramento durante a gravação.
 
