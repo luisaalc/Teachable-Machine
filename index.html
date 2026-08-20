@@ -124,13 +124,14 @@
     margin-top: 4px;
   }
 
-  #label-container div {
+  .prediction-card {
     background: var(--purple-100);
     border-radius: 14px;
     padding: 14px 18px;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    width: 100%;
   }
 
   .label-row {
@@ -151,20 +152,22 @@
     color: var(--purple-700);
   }
 
+  /* --- AJUSTES NA BARRA --- */
   .bar-track {
     width: 100%;
-    height: 8px;
-    background: var(--purple-300);
+    height: 12px;
+    background: #e2d9f3;
     border-radius: 999px;
     overflow: hidden;
+    position: relative;
   }
 
   .bar-fill {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, var(--purple-900), var(--purple-300));
+    background: var(--purple-700);
     border-radius: 999px;
-    transition: width 0.2s ease;
+    transition: width 0.2s linear;
   }
 
   .hint {
@@ -210,24 +213,17 @@
 <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
 
 <script type="text/javascript">
-
-    // Link do modelo hospedado no Teachable Machine
     const URL = "https://teachablemachine.withgoogle.com/models/V5-YG544t/";
 
     let model, webcam, labelContainer, maxPredictions;
 
-    // Carrega o modelo e inicia a câmera
     async function init() {
         const modelURL = URL + "model.json";
         const metadataURL = URL + "metadata.json";
 
-        // Carrega o modelo
         model = await tmImage.load(modelURL, metadataURL);
-
-        // Quantidade total de categorias
         maxPredictions = model.getTotalClasses();
 
-        // Configuração da webcam
         const flip = true;
         webcam = new tmImage.Webcam(320, 320, flip);
 
@@ -236,79 +232,64 @@
 
         window.requestAnimationFrame(loop);
 
-        // Coloca a câmera na página
         document.getElementById("webcam-container").innerHTML = "";
         document.getElementById("webcam-container").appendChild(webcam.canvas);
 
-        // Cria os espaços para as categorias
         labelContainer = document.getElementById("label-container");
         labelContainer.innerHTML = "";
 
-        // Só cria elementos para as categorias diferentes de "fundo"
         for (let i = 0; i < maxPredictions; i++) {
-
             const className = model.getClassLabels()[i];
 
-            // Ignora a categoria "fundo"
             if (className.toLowerCase() === "fundo") {
                 continue;
             }
 
+            // Criando os elementos explicitamente pelo JS para evitar bugs do innerHTML
             const item = document.createElement("div");
+            item.className = "prediction-card";
+            item.dataset.index = i;
 
             item.innerHTML = `
                 <div class="label-row">
-                    <span class="label-name"></span>
-                    <span class="label-percent"></span>
+                    <span class="label-name">${className}</span>
+                    <span class="label-percent">0%</span>
                 </div>
-
                 <div class="bar-track">
                     <div class="bar-fill"></div>
                 </div>
             `;
 
-            // Guarda o índice original da previsão
-            item.dataset.index = i;
-
             labelContainer.appendChild(item);
         }
     }
 
-    // Atualiza a câmera continuamente
     async function loop() {
         webcam.update();
         await predict();
-
         window.requestAnimationFrame(loop);
     }
 
-    // Faz a previsão
     async function predict() {
+        if (!model) return;
 
         const prediction = await model.predict(webcam.canvas);
-
-        // Percorre os elementos exibidos
         const items = labelContainer.children;
 
         for (let i = 0; i < items.length; i++) {
-
-            // Recupera o índice original da categoria
             const index = parseInt(items[i].dataset.index);
+            const prob = prediction[index].probability;
+            const percent = Math.round(prob * 100);
 
-            const className = prediction[index].className;
-            const percent = (prediction[index].probability * 100).toFixed(0);
+            // Seleciona os elementos e atualiza
+            const percentLabel = items[i].querySelector(".label-percent");
+            const barFill = items[i].querySelector(".bar-fill");
 
-            items[i].querySelector(".label-name").textContent = className;
-            items[i].querySelector(".label-percent").textContent = percent + "%";
-
-            items[i].querySelector(".bar-fill").style.width = percent + "%";
+            if (percentLabel) percentLabel.textContent = percent + "%";
+            if (barFill) barFill.style.width = percent + "%";
         }
     }
-
 </script>
-
-</body>
-</html>
 
 </body>
 </html>
