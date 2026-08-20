@@ -63,15 +63,12 @@ Foram capturadas amostras em vídeo/imagem para cada uma das três classes (`com
 
 ## Prints de uso do modelo
 
-![Print com carta](./prints/com-carta.png)
-![Print sem carta](./prints/sem-carta.png)
-![Print fundo](./prints/fundo.png)
+![Print com carta](./prints/print-com-carta.png)
+![Print sem carta](./prints/print-sem-carta.png)
 
 ## Reflexão sobre os testes
 
-> Preencha esta seção com base nos testes reais feitos com o modelo. Abaixo está um modelo de reflexão — ajuste com o que você realmente observou.
-
-Durante os testes, o modelo [confundiu / não confundiu] as classes `com carta` e `sem carta` em algumas situações, principalmente quando [descreva a situação, ex: a carta estava parcialmente fora do quadro ou a iluminação estava mais fraca]. Isso provavelmente aconteceu por causa de [escolha o(s) motivo(s) mais prováveis: iluminação inconsistente entre as gravações de treino e o teste real; poucos exemplos de treino cobrindo diferentes ângulos e distâncias da carta; ou um fundo poluído/muito diferente do fundo usado durante a coleta de dados, o que fez o modelo associar parte do acerto ao ambiente e não apenas à carta]. Para reduzir esse erro, seria interessante gravar mais amostras variando iluminação, distância e fundo.
+Durante os testes, o modelo não confundiu as classes `com carta` e `sem carta`. Isso provavelmente aconteceu por causa do fundo sem informação, boa iluminação e falta de variação nos testes. Para conferir a qualidade real do modelo seria interessante testar em locais com fundo e iluminações diferentes.
 
 ## Como executar
 
